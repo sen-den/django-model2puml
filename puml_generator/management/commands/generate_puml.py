@@ -49,11 +49,17 @@ class Command(BaseCommand):
             nargs='?',
             help='provide title',
         )
+        add_bool_arg(
+            parser, 'add-legend',
+            'include explanation of the symbols used',
+            'do not include explanation of the symbols used'
+        )
 
     def handle(self, *args, **options):
         output = options['file']
         generate_with_help = options['add-help']
         generate_with_choices = options['add-choices']
+        generate_with_legend = options['add-legend']
         include = options['include']
         omit = options['omit']
         title = options['title']
@@ -62,6 +68,7 @@ class Command(BaseCommand):
         uml = generate_puml_class_diagram(
             models,
             title=title,
+            with_legend=generate_with_legend,
             with_help=generate_with_help,
             with_choices=generate_with_choices,
             include=include,

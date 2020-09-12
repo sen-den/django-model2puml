@@ -106,9 +106,25 @@ def is_app_member(model, app_name: str):
     return  str(model._meta.label).startswith(app_name + '.')
 
 
+def legend() -> str:
+    return """
+    class "Explanation of the symbols used" as DESCRIPTION #FFF { 
+    - AutoField (identifiers)
+    ..
+    + Regular field (anything)
+    ..
+    # ForeignKey (ManyToMany)
+    ..
+    ~ ForeignKey (OneToOne, OneToMany)
+    --
+}\n\n
+"""
+
+
 def generate_puml_class_diagram(
         models,
         title=None,
+        with_legend=False,
         with_help=True,
         with_choices=True,
         include=None,
@@ -126,7 +142,8 @@ def generate_puml_class_diagram(
         {title}
         end title\n
         """
-
+    if with_legend:
+        uml += legend()
 
     for model in models:
         if omit and any([is_app_member(model, to_omit) for to_omit in omit]):
