@@ -108,6 +108,7 @@ def is_app_member(model, app_name: str):
 
 def generate_puml_class_diagram(
         models,
+        title=None,
         with_help=True,
         with_choices=True,
         include=None,
@@ -116,6 +117,16 @@ def generate_puml_class_diagram(
     global_choices = dict()
 
     uml = "@startuml\n"
+
+    if title:
+        uml += f"""
+        skinparam titleFontSize 72
+
+        title
+        {title}
+        end title\n
+        """
+
 
     for model in models:
         if omit and any([is_app_member(model, to_omit) for to_omit in omit]):

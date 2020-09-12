@@ -43,6 +43,12 @@ class Command(BaseCommand):
             'models Choices fields should be described',
             'models Choices fields should not be described'
         )
+        parser.add_argument(
+            '--title',
+            type=str,
+            nargs='?',
+            help='provide title',
+        )
 
     def handle(self, *args, **options):
         output = options['file']
@@ -50,10 +56,12 @@ class Command(BaseCommand):
         generate_with_choices = options['add-choices']
         include = options['include']
         omit = options['omit']
+        title = options['title']
 
         models = apps.get_models()
         uml = generate_puml_class_diagram(
             models,
+            title=title,
             with_help=generate_with_help,
             with_choices=generate_with_choices,
             include=include,
