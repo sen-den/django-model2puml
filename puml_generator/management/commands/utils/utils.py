@@ -2,6 +2,7 @@ import colorsys
 from hashlib import md5
 from typing import Optional, Tuple
 
+from django.db.models import ForeignKey, ManyToManyField
 from model_utils import Choices
 
 
@@ -88,13 +89,11 @@ def model_repr(model, with_help=True, with_choices=True) -> Tuple[str, dict]:
     uml += f'    --\n'
     uml += f'}}\n'
 
-    for related in meta.related_objects:
-        sign = ' -- '
-        if related.__class__.__name__ == "ManyToOneRel":
-            sign = ' *-- '
-        elif related.__class__.__name__ == "ManyToManyRel":
-            sign = ' *--* '
-        uml += f'{meta.label}{sign}{related.field.model._meta.label}\n'
+    for related in list(filter(lambda x: isinstance(x, ForeignKey), fields)):
+        uml += f'{meta.label} -- {related.foreign_related_fields[0].model._meta.label}\n'
+    for related in list(filter(lambda x: isinstance(x, ManyToManyField), fields)):
+        uml += f'{meta.label} -- {related.target_field.model._meta.label}\n'
+
     if with_choices:
         for choice_field_name, choices in model_choices.items():
             uml += f'{meta.label} .- {choice_field_name}\n'
