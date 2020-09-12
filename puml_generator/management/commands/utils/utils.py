@@ -90,9 +90,9 @@ def model_repr(model, with_help=True, with_choices=True) -> Tuple[str, dict]:
     uml += f'}}\n'
 
     for related in list(filter(lambda x: isinstance(x, ForeignKey), fields)):
-        uml += f'{meta.label} -- {related.foreign_related_fields[0].model._meta.label}\n'
+        uml += f'{meta.label} *-- {related.foreign_related_fields[0].model._meta.label}\n'
     for related in list(filter(lambda x: isinstance(x, ManyToManyField), fields)):
-        uml += f'{meta.label} -- {related.target_field.model._meta.label}\n'
+        uml += f'{meta.label} *--* {related.target_field.model._meta.label}\n'
 
     if with_choices:
         for choice_field_name, choices in model_choices.items():
@@ -103,7 +103,7 @@ def model_repr(model, with_help=True, with_choices=True) -> Tuple[str, dict]:
 
 
 def is_app_member(model, app_name: str):
-    return  str(model._meta.label).startswith(app_name + '.')
+    return str(model._meta.label).startswith(app_name + '.')
 
 
 def legend() -> str:

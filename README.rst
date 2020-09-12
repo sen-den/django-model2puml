@@ -20,5 +20,10 @@ Quick start
 Params::
 
 --file - output file
+--title - provide a title for diagram
 --add-help - to add docstrings to diagram
 --add-choices - to add Choices description of fields to diagram
+--add-legend - to include explanation of the symbols used
+--omit - specify apps to be omitted in diagram
+--include - specify apps to be included in diagram
+
