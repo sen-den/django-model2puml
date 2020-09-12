@@ -58,7 +58,11 @@ def collect_choices(field) -> Optional:
             return {k: (k, v) for k, v in choices}
 
 
-def model_repr(model, with_help=True, with_choices=True, omit=None, with_omitted_headers=False) -> Tuple[str, dict]:
+def model_repr(
+        model,
+        with_help=True, with_choices=True,
+        include=None, omit=None, with_omitted_headers=False,
+) -> Tuple[str, dict]:
     uml = ''
     meta = model._meta
     model_choices = dict()
@@ -89,7 +93,7 @@ def model_repr(model, with_help=True, with_choices=True, omit=None, with_omitted
     uml += f'    --\n'
     uml += f'}}\n'
 
-    uml += model_relations_repr(meta, omit, with_omitted_headers)
+    uml += model_relations_repr(meta, include, omit, with_omitted_headers)
 
     if with_choices:
         for choice_field_name, choices in model_choices.items():
@@ -106,24 +110,28 @@ def retrieve_field_related_model(field):
         return field.target_field.model
 
 
-def is_allowed_related(related, omit):
-    if not omit:
+def is_allowed_related(related, include, omit):
+    if not omit and not include:
         return True
-    return not any([is_app_member(retrieve_field_related_model(related), app_name) for app_name in omit])
+    omit = omit or []
+    include = include or []
+    is_omitted = any([is_app_member(retrieve_field_related_model(related), app_name) for app_name in omit])
+    is_included = any([is_app_member(retrieve_field_related_model(related), app_name) for app_name in include])
+    if include and not is_included:
+        return False
+    return not is_omitted
 
 
-def model_relations_repr(meta, omit=None, with_omitted_headers=False) -> str:
+def model_relations_repr(meta, include=None, omit=None, with_omitted_headers=False) -> str:
     uml = ''
     fields = list(meta.fields)
     fields.extend(meta.many_to_many)
     for related in list(filter(lambda x: isinstance(x, ForeignKey), fields)):
-        if not with_omitted_headers and not is_allowed_related(related, omit=omit):
-            continue
-        uml += f'{meta.label} *-- {related.foreign_related_fields[0].model._meta.label}\n'
+        if with_omitted_headers or is_allowed_related(related, include=include, omit=omit):
+            uml += f'{meta.label} *-- {related.foreign_related_fields[0].model._meta.label}\n'
     for related in list(filter(lambda x: isinstance(x, ManyToManyField), fields)):
-        if not with_omitted_headers and not is_allowed_related(related, omit=omit):
-            continue
-        uml += f'{meta.label} *--* {related.target_field.model._meta.label}\n'
+        if with_omitted_headers or is_allowed_related(related, include=include, omit=omit):
+            uml += f'{meta.label} *--* {related.target_field.model._meta.label}\n'
     return uml
 
 
@@ -178,7 +186,7 @@ def generate_puml_class_diagram(
             continue
         model_uml, model_choices = model_repr(
             model, with_help=with_help, with_choices=with_choices,
-            omit=omit, with_omitted_headers=with_omitted_headers,
+            include=include, omit=omit, with_omitted_headers=with_omitted_headers,
         )
         uml += model_uml
         global_choices = {**global_choices, **model_choices}
