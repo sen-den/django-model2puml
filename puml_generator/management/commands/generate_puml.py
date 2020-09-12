@@ -27,6 +27,12 @@ class Command(BaseCommand):
             nargs='+',
             help='omit applications',
         )
+        parser.add_argument(
+            '--include',
+            type=str,
+            nargs='+',
+            help='include applications',
+        )
         add_bool_arg(
             parser, 'add-help',
             'docstrings should be included to diagram',
@@ -42,6 +48,7 @@ class Command(BaseCommand):
         output = options['file']
         generate_with_help = options['add-help']
         generate_with_choices = options['add-choices']
+        include = options['include']
         omit = options['omit']
 
         models = apps.get_models()
@@ -49,6 +56,7 @@ class Command(BaseCommand):
             models,
             with_help=generate_with_help,
             with_choices=generate_with_choices,
+            include=include,
             omit=omit,
         )
 

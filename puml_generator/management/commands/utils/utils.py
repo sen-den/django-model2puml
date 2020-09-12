@@ -110,6 +110,7 @@ def generate_puml_class_diagram(
         models,
         with_help=True,
         with_choices=True,
+        include=None,
         omit=None,
 ) -> str:
     global_choices = dict()
@@ -118,6 +119,8 @@ def generate_puml_class_diagram(
 
     for model in models:
         if omit and any([is_app_member(model, to_omit) for to_omit in omit]):
+            continue
+        if include and all([not is_app_member(model, to_include) for to_include in include]):
             continue
         model_uml, model_choices = model_repr(model, with_help=with_help, with_choices=with_choices)
         uml += model_uml
