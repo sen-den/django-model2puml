@@ -43,6 +43,11 @@ class Command(BaseCommand):
             'models Choices fields should be described',
             'models Choices fields should not be described'
         )
+        add_bool_arg(
+            parser, 'add-omitted-headers',
+            'omitted models should be included as headers',
+            'omitted models should not be included at all'
+        )
         parser.add_argument(
             '--title',
             type=str,
@@ -60,6 +65,7 @@ class Command(BaseCommand):
         generate_with_help = options['add-help']
         generate_with_choices = options['add-choices']
         generate_with_legend = options['add-legend']
+        generate_with_omitted_headers = options['add-omitted-headers']
         include = options['include']
         omit = options['omit']
         title = options['title']
@@ -73,6 +79,7 @@ class Command(BaseCommand):
             with_choices=generate_with_choices,
             include=include,
             omit=omit,
+            with_omitted_headers=generate_with_omitted_headers,
         )
 
         with open(output, 'w') as file:

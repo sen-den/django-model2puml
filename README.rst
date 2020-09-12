@@ -24,6 +24,6 @@ Params::
 --add-help - to add docstrings to diagram
 --add-choices - to add Choices description of fields to diagram
 --add-legend - to include explanation of the symbols used
+--add-omitted-headers - for omitted foreign app a header stub should be presented
 --omit - specify apps to be omitted in diagram
---include - specify apps to be included in diagram
-
+--include - specify apps to be included in diagram; other will be omitted

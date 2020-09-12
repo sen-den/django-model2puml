@@ -58,7 +58,7 @@ def collect_choices(field) -> Optional:
             return {k: (k, v) for k, v in choices}
 
 
-def model_repr(model, with_help=True, with_choices=True) -> Tuple[str, dict]:
+def model_repr(model, with_help=True, with_choices=True, omit=None, with_omitted_headers=False) -> Tuple[str, dict]:
     uml = ''
     meta = model._meta
     model_choices = dict()
@@ -89,10 +89,7 @@ def model_repr(model, with_help=True, with_choices=True) -> Tuple[str, dict]:
     uml += f'    --\n'
     uml += f'}}\n'
 
-    for related in list(filter(lambda x: isinstance(x, ForeignKey), fields)):
-        uml += f'{meta.label} *-- {related.foreign_related_fields[0].model._meta.label}\n'
-    for related in list(filter(lambda x: isinstance(x, ManyToManyField), fields)):
-        uml += f'{meta.label} *--* {related.target_field.model._meta.label}\n'
+    uml += model_relations_repr(meta, omit, with_omitted_headers)
 
     if with_choices:
         for choice_field_name, choices in model_choices.items():
@@ -100,6 +97,34 @@ def model_repr(model, with_help=True, with_choices=True) -> Tuple[str, dict]:
 
     uml += f'\n\n'
     return uml, model_choices
+
+
+def retrieve_field_related_model(field):
+    if isinstance(field, ForeignKey):
+        return field.foreign_related_fields[0].model
+    elif isinstance(field, ManyToManyField):
+        return field.target_field.model
+
+
+def is_allowed_related(related, omit):
+    if not omit:
+        return True
+    return not any([is_app_member(retrieve_field_related_model(related), app_name) for app_name in omit])
+
+
+def model_relations_repr(meta, omit=None, with_omitted_headers=False) -> str:
+    uml = ''
+    fields = list(meta.fields)
+    fields.extend(meta.many_to_many)
+    for related in list(filter(lambda x: isinstance(x, ForeignKey), fields)):
+        if not with_omitted_headers and not is_allowed_related(related, omit=omit):
+            continue
+        uml += f'{meta.label} *-- {related.foreign_related_fields[0].model._meta.label}\n'
+    for related in list(filter(lambda x: isinstance(x, ManyToManyField), fields)):
+        if not with_omitted_headers and not is_allowed_related(related, omit=omit):
+            continue
+        uml += f'{meta.label} *--* {related.target_field.model._meta.label}\n'
+    return uml
 
 
 def is_app_member(model, app_name: str):
@@ -129,6 +154,7 @@ def generate_puml_class_diagram(
         with_choices=True,
         include=None,
         omit=None,
+        with_omitted_headers=False,
 ) -> str:
     global_choices = dict()
 
@@ -150,7 +176,10 @@ def generate_puml_class_diagram(
             continue
         if include and all([not is_app_member(model, to_include) for to_include in include]):
             continue
-        model_uml, model_choices = model_repr(model, with_help=with_help, with_choices=with_choices)
+        model_uml, model_choices = model_repr(
+            model, with_help=with_help, with_choices=with_choices,
+            omit=omit, with_omitted_headers=with_omitted_headers,
+        )
         uml += model_uml
         global_choices = {**global_choices, **model_choices}
 
