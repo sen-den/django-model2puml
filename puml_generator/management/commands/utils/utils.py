@@ -103,12 +103,23 @@ def model_repr(model, with_help=True, with_choices=True) -> Tuple[str, dict]:
     return uml, model_choices
 
 
-def generate_puml_class_diagram(models, with_help=True, with_choices=True) -> str:
+def is_app_member(model, app_name: str):
+    return  str(model._meta.label).startswith(app_name + '.')
+
+
+def generate_puml_class_diagram(
+        models,
+        with_help=True,
+        with_choices=True,
+        omit=None,
+) -> str:
     global_choices = dict()
 
     uml = "@startuml\n"
 
     for model in models:
+        if omit and any([is_app_member(model, to_omit) for to_omit in omit]):
+            continue
         model_uml, model_choices = model_repr(model, with_help=with_help, with_choices=with_choices)
         uml += model_uml
         global_choices = {**global_choices, **model_choices}

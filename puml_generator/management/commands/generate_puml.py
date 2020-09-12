@@ -21,6 +21,12 @@ class Command(BaseCommand):
             help='output file',
             default='models_diagram.puml',
         )
+        parser.add_argument(
+            '--omit',
+            type=str,
+            nargs='+',
+            help='omit applications',
+        )
         add_bool_arg(
             parser, 'add-help',
             'docstrings should be included to diagram',
@@ -36,12 +42,14 @@ class Command(BaseCommand):
         output = options['file']
         generate_with_help = options['add-help']
         generate_with_choices = options['add-choices']
+        omit = options['omit']
 
         models = apps.get_models()
         uml = generate_puml_class_diagram(
             models,
             with_help=generate_with_help,
-            with_choices=generate_with_choices
+            with_choices=generate_with_choices,
+            omit=omit,
         )
 
         with open(output, 'w') as file:
