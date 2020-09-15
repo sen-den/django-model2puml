@@ -48,6 +48,11 @@ class Command(BaseCommand):
             'omitted models should be included as headers',
             'omitted models should not be included at all'
         )
+        add_bool_arg(
+            parser, 'headers-only',
+            'use only model header and relations, omit fields list',
+            'describe model fields'
+        )
         parser.add_argument(
             '--title',
             type=str,
@@ -66,6 +71,7 @@ class Command(BaseCommand):
         generate_with_choices = options['add-choices']
         generate_with_legend = options['add-legend']
         generate_with_omitted_headers = options['add-omitted-headers']
+        generate_headers_only = options['headers-only']
         include = options['include']
         omit = options['omit']
         title = options['title']
@@ -80,6 +86,7 @@ class Command(BaseCommand):
             include=include,
             omit=omit,
             with_omitted_headers=generate_with_omitted_headers,
+            generate_headers_only=generate_headers_only,
         )
 
         with open(output, 'w') as file:

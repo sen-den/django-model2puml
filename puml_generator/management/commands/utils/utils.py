@@ -62,6 +62,7 @@ def model_repr(
         model,
         with_help=True, with_choices=True,
         include=None, omit=None, with_omitted_headers=False,
+        generate_headers_only=False,
 ) -> Tuple[str, dict]:
     uml = ''
     meta = model._meta
@@ -83,7 +84,8 @@ def model_repr(
     fields.extend(meta.many_to_many)
 
     for field in fields:
-        uml += field_repr(field, with_help=with_help)
+        if not generate_headers_only:
+            uml += field_repr(field, with_help=with_help)
 
         if with_choices:
             choices = collect_choices(field)
@@ -163,6 +165,7 @@ def generate_puml_class_diagram(
         include=None,
         omit=None,
         with_omitted_headers=False,
+        generate_headers_only=False,
 ) -> str:
     global_choices = dict()
 
@@ -187,6 +190,7 @@ def generate_puml_class_diagram(
         model_uml, model_choices = model_repr(
             model, with_help=with_help, with_choices=with_choices,
             include=include, omit=omit, with_omitted_headers=with_omitted_headers,
+            generate_headers_only=generate_headers_only,
         )
         uml += model_uml
         global_choices = {**global_choices, **model_choices}

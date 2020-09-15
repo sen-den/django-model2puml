@@ -33,3 +33,4 @@ Params::
 --add-omitted-headers - for omitted foreign app a header stub should be presented
 --omit - specify apps to be omitted in diagram
 --include - specify apps to be included in diagram; other will be omitted
+--headers-only - use only model header and relations, omit fields list
