@@ -1,3 +1,5 @@
+import codecs
+
 from django.apps import apps
 from django.core.management import BaseCommand
 
@@ -89,5 +91,5 @@ class Command(BaseCommand):
             generate_headers_only=generate_headers_only,
         )
 
-        with open(output, 'w') as file:
+        with codecs.open(output, 'w', encoding='utf-8') as file:
             file.write(uml)
