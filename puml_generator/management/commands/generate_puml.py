@@ -3,7 +3,7 @@ import codecs
 from django.apps import apps
 from django.core.management import BaseCommand
 
-from puml_generator.management.commands.utils.utils import generate_puml_class_diagram
+from puml_generator.management.commands.utils.utils import PlantUml
 
 
 def add_bool_arg(parser, name, help_yes, help_no, default=False):
@@ -79,7 +79,7 @@ class Command(BaseCommand):
         title = options['title']
 
         models = apps.get_models()
-        uml = generate_puml_class_diagram(
+        generator = PlantUml(
             models,
             title=title,
             with_legend=generate_with_legend,
@@ -90,6 +90,7 @@ class Command(BaseCommand):
             with_omitted_headers=generate_with_omitted_headers,
             generate_headers_only=generate_headers_only,
         )
+        uml = generator.generate_puml_class_diagram()
 
         with codecs.open(output, 'w', encoding='utf-8') as file:
             file.write(uml)
