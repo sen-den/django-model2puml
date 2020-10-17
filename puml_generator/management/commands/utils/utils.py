@@ -195,7 +195,7 @@ class PlantUml:
         if self.with_choices:
             # generate links to choices list classes
             for choice_field_name, choices in model_choices.items():
-                uml += f'{meta.label} .- {choice_field_name}\n'
+                uml += f'{meta.label} .-- {choice_field_name}\n'
 
         uml += f'\n\n'
         return uml, model_choices
