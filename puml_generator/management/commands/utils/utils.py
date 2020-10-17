@@ -1,6 +1,7 @@
 import colorsys
 from hashlib import md5
 from typing import Optional, Tuple
+import textwrap
 
 from django.db.models import ForeignKey, ManyToManyField
 from model_utils import Choices
@@ -93,6 +94,22 @@ class PlantUml:
             return False
         return not is_omitted
 
+    @staticmethod
+    def wrap_text(text: str, limit: int = 80, limit_first: int = 80) -> str:
+        """
+        Limit text width
+        :param text: text to be formatted
+        :param limit: width limit
+        :param limit_first: special limit for first line
+        :return: formatted text
+        """
+        strings = []
+        lines = text.splitlines()
+        for ix in lines:
+            strings += textwrap.wrap(ix, width=limit, initial_indent=' '*(limit - limit_first))
+        clean_text = str('\n').join(strings).strip()
+        return clean_text
+
     def field_repr(self, field) -> str:
         """
         Generate PlantUML representation of model field.
@@ -109,10 +126,13 @@ class PlantUml:
             sign = '~'
         elif field.__class__.__name__ == "ManyToManyField":
             sign = '#'
-        uml += f'    {sign} {field.name} ({field.__class__.__name__})'
+        field_description = f'    {sign} {field.name} ({field.__class__.__name__})'
+        uml += field_description
+
         if self.with_help:
-            # TODO force 80/120 columns
-            uml += f' - {field.help_text}' if field.help_text else ''
+            description_len = len(field_description)
+            doc = self.wrap_text(field.help_text, 80, 80-description_len) if field.help_text else ''
+            uml += f' - {doc}'
         uml += '\n'
         return uml
 
@@ -167,8 +187,8 @@ class PlantUml:
         if self.with_help:
             # add help text stored in docstring
             uml += f'    ..\n'
-            # TODO force 80/120 columns
-            doc = str(model.__doc__).strip().replace("\n\n", "\n")
+            docstring = str(model.__doc__).strip().replace("\n\n", "\n")
+            doc = self.wrap_text(docstring)
             uml += f'    {doc}\n'
         uml += f'    --\n'
 
