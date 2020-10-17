@@ -9,7 +9,7 @@ CHOICES_COLOR = '#EEE'
 AUTO_FIELDS = {"AutoField", "AutoLastModifiedField", "AutoCreatedField"}
 
 LEGEND = """
-    class "Explanation of the symbols used" as DESCRIPTION #FFF { 
+    class "Explanation of the symbols used" as DESCRIPTION #FFF {
     - AutoField (identifiers)
     ..
     + Regular field (anything)
@@ -23,9 +23,16 @@ LEGEND = """
 
 
 def app_name_to_colour(name: str) -> str:
+    """
+    Generate RGB colour based on name.
+    :param name: application name
+    :return: #RGB
+    """
+
     def _h(v: float):
         return str(hex(int(v * 255)))[2:].ljust(2).replace(' ', '0')
 
+    # encode colour hue as name hash
     hue = int(md5(name.encode()).hexdigest(), 16) % 360 / 360.0
     r, g, b = colorsys.hls_to_rgb(hue, 0.90, 0.60)
     r, g, b = _h(r), _h(g), _h(b)
@@ -33,8 +40,6 @@ def app_name_to_colour(name: str) -> str:
 
 
 class PlantUml:
-    uml = None
-
     def __init__(
             self,
             models=None,
@@ -60,9 +65,20 @@ class PlantUml:
 
     @staticmethod
     def is_app_member(model, app_name: str) -> bool:
+        """
+        Checks is model a member of app_name or not.
+        :param model: django model instance
+        :param app_name: label of django application
+        :return:
+        """
         return str(model._meta.label).startswith(app_name + '.')
 
-    def is_allowed_related(self, related):
+    def is_allowed_related(self, related) -> bool:
+        """
+        Checks is related class have to be rendered or not.
+        :param related: django model field
+        :return:
+        """
         if not self.omit and not self.include:
             return True
         omit = self.omit or []
@@ -78,6 +94,11 @@ class PlantUml:
         return not is_omitted
 
     def field_repr(self, field) -> str:
+        """
+        Generate PlantUML representation of model field.
+        :param field: django models field
+        :return: representation
+        """
         uml = ''
         sign = '+'
         if field.__class__.__name__ in AUTO_FIELDS:
@@ -97,6 +118,12 @@ class PlantUml:
 
     @staticmethod
     def choice_repr(name, items) -> str:
+        """
+        Generate PlantUML representation of model field choices as class.
+        :param name: choices list name
+        :param items: dict of choices values
+        :return: representation
+        """
         uml = ''
         if items:
             uml += f'enum "{name} <choices>" as {name} {CHOICES_COLOR}'
@@ -107,7 +134,12 @@ class PlantUml:
         return uml
 
     @staticmethod
-    def collect_choices(field) -> Optional:
+    def collect_choices(field) -> Optional[dict]:
+        """
+        Collect choices of model field in the case exists.
+        :param field: choices of django models field
+        :return: dict of choices values
+        """
         if field.choices:
             choices = field.choices
             if isinstance(choices, Choices):
@@ -116,6 +148,12 @@ class PlantUml:
                 return {k: (k, v) for k, v in choices}
 
     def model_repr(self, model) -> Tuple[str, dict]:
+        """
+        Generate PlantUML representation of model class.
+        Links to related models and choices would be added where suitable.
+        :param model: django model
+        :return: representation; dict of choices
+        """
         uml = ''
         meta = model._meta
         model_choices = dict()
@@ -127,7 +165,9 @@ class PlantUml:
         uml += f'    {meta.verbose_name}\n'
 
         if self.with_help:
+            # add help text stored in docstring
             uml += f'    ..\n'
+            # TODO force 80/120 columns
             doc = str(model.__doc__).strip().replace("\n\n", "\n")
             uml += f'    {doc}\n'
         uml += f'    --\n'
@@ -137,9 +177,11 @@ class PlantUml:
 
         for field in fields:
             if not self.generate_headers_only:
+                # add field to model representation
                 uml += self.field_repr(field)
 
             if self.with_choices:
+                # collect field choices to future processing
                 choices = self.collect_choices(field)
                 if choices:
                     model_choices[field.name] = choices
@@ -147,9 +189,11 @@ class PlantUml:
         uml += f'    --\n'
         uml += f'}}\n'
 
+        # add links to related models
         uml += self.model_relations_repr(meta)
 
         if self.with_choices:
+            # generate links to choices list classes
             for choice_field_name, choices in model_choices.items():
                 uml += f'{meta.label} .- {choice_field_name}\n'
 
@@ -158,15 +202,26 @@ class PlantUml:
 
     @staticmethod
     def retrieve_field_related_model(field) -> Optional:
+        """
+        In the case field represents link to related model retrieves model.
+        :param field: django model field
+        :return: django model
+        """
         if isinstance(field, ForeignKey):
             return field.foreign_related_fields[0].model
         elif isinstance(field, ManyToManyField):
             return field.target_field.model
 
     def model_relations_repr(self, meta) -> str:
+        """
+        Generate PlantUML representation of model relations.
+        :param meta: django model meta
+        :return: representation
+        """
         uml = ''
         fields = list(meta.fields)
         fields.extend(meta.many_to_many)
+        # generate links to related models
         for related in list(filter(lambda x: isinstance(x, ForeignKey), fields)):
             if self.with_omitted_headers or self.is_allowed_related(related):
                 uml += f'{meta.label} *-- {related.foreign_related_fields[0].model._meta.label}\n'
@@ -176,6 +231,11 @@ class PlantUml:
         return uml
 
     def generate_puml_class_diagram(self) -> str:
+        """
+        Generate django applications PlantUML annotation.
+        Based on context passed.
+        :return: string of PlantUML classes annotation
+        """
         global_choices = dict()
 
         uml = "@startuml\n"
@@ -183,7 +243,7 @@ class PlantUml:
         if self.title:
             uml += f"""
             skinparam titleFontSize 72
-    
+
             title
             {self.title}
             end title\n
@@ -192,15 +252,18 @@ class PlantUml:
             uml += self.legend
 
         for model in self.models:
+            # omit model in the case it is omited or not included
             if self.omit and any([self.is_app_member(model, to_omit) for to_omit in self.omit]):
                 continue
             if self.include and all([not self.is_app_member(model, to_include) for to_include in self.include]):
                 continue
             model_uml, model_choices = self.model_repr(model)
             uml += model_uml
+            # collect model choices to future processing
             global_choices = {**global_choices, **model_choices}
 
         if self.with_choices:
+            # generate choices list classes
             for key, values in global_choices.items():
                 uml += self.choice_repr(key, values)
 
