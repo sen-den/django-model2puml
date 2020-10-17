@@ -219,15 +219,20 @@ class PlantUml:
         :return: representation
         """
         uml = ''
+        foreign_line = '*--'
+        many_to_many_line = '*--*'
+
         fields = list(meta.fields)
         fields.extend(meta.many_to_many)
         # generate links to related models
         for related in list(filter(lambda x: isinstance(x, ForeignKey), fields)):
             if self.with_omitted_headers or self.is_allowed_related(related):
-                uml += f'{meta.label} *-- {related.foreign_related_fields[0].model._meta.label}\n'
+                related_meta = related.foreign_related_fields[0].model._meta
+                uml += f'{meta.label} {foreign_line} {related_meta.label}\n'
         for related in list(filter(lambda x: isinstance(x, ManyToManyField), fields)):
             if self.with_omitted_headers or self.is_allowed_related(related):
-                uml += f'{meta.label} *--* {related.target_field.model._meta.label}\n'
+                related_meta = related.target_field.model._meta
+                uml += f'{meta.label} {many_to_many_line} {related_meta.label}\n'
         return uml
 
     def generate_puml_class_diagram(self) -> str:
