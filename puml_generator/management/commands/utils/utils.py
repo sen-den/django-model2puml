@@ -3,9 +3,6 @@ from hashlib import md5
 from typing import Optional, Tuple
 import textwrap
 
-from django.db.models import ForeignKey, ManyToManyField
-from model_utils import Choices
-
 CHOICES_COLOR = '#EEE'
 AUTO_FIELDS = {"AutoField", "AutoLastModifiedField", "AutoCreatedField"}
 
@@ -162,7 +159,7 @@ class PlantUml:
         """
         if field.choices:
             choices = field.choices
-            if isinstance(choices, Choices):
+            if type(choices).__name__ == 'Choices':
                 return choices._display_map
             elif isinstance(choices, tuple):
                 return {k: (k, v) for k, v in choices}
@@ -227,9 +224,9 @@ class PlantUml:
         :param field: django model field
         :return: django model
         """
-        if isinstance(field, ForeignKey):
+        if type(field).__name__ == 'ForeignKey':
             return field.foreign_related_fields[0].model
-        elif isinstance(field, ManyToManyField):
+        elif type(field).__name__ == 'ManyToManyField':
             return field.target_field.model
 
     def model_relations_repr(self, meta) -> str:
@@ -245,11 +242,11 @@ class PlantUml:
         fields = list(meta.fields)
         fields.extend(meta.many_to_many)
         # generate links to related models
-        for related in list(filter(lambda x: isinstance(x, ForeignKey), fields)):
+        for related in list(filter(lambda x: type(x).__name__ == 'ForeignKey', fields)):
             if self.with_omitted_headers or self.is_allowed_related(related):
                 related_meta = related.foreign_related_fields[0].model._meta
                 uml += f'{meta.label} {foreign_line} {related_meta.label}\n'
-        for related in list(filter(lambda x: isinstance(x, ManyToManyField), fields)):
+        for related in list(filter(lambda x: type(x).__name__ == 'ManyToManyField', fields)):
             if self.with_omitted_headers or self.is_allowed_related(related):
                 related_meta = related.target_field.model._meta
                 uml += f'{meta.label} {many_to_many_line} {related_meta.label}\n'
