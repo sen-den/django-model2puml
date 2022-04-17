@@ -55,6 +55,11 @@ class Command(BaseCommand):
             'use only model header and relations, omit fields list',
             'describe model fields'
         )
+        add_bool_arg(
+            parser, 'omit-history',
+            'omit django-simple-history models',
+            'include django-simple-history models'
+        )
         parser.add_argument(
             '--title',
             type=str,
@@ -74,6 +79,7 @@ class Command(BaseCommand):
         generate_with_legend = options['add-legend']
         generate_with_omitted_headers = options['add-omitted-headers']
         generate_headers_only = options['headers-only']
+        omit_history = options['omit-history']
         include = options['include']
         omit = options['omit']
         title = options['title']
@@ -85,6 +91,7 @@ class Command(BaseCommand):
             with_legend=generate_with_legend,
             with_help=generate_with_help,
             with_choices=generate_with_choices,
+            omit_history=omit_history,
             include=include,
             omit=omit,
             with_omitted_headers=generate_with_omitted_headers,

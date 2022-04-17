@@ -45,6 +45,7 @@ class PlantUml:
             with_legend=False,
             with_help=True,
             with_choices=True,
+            omit_history=True,
             include=None,
             omit=None,
             with_omitted_headers=False,
@@ -55,6 +56,7 @@ class PlantUml:
         self.with_legend = with_legend
         self.with_help = with_help
         self.with_choices = with_choices
+        self.omit_history = omit_history
         self.include = include
         self.omit = omit
         self.with_omitted_headers = with_omitted_headers
@@ -70,6 +72,16 @@ class PlantUml:
         :return:
         """
         return str(model._meta.label).startswith(app_name + '.')
+
+    @staticmethod
+    def is_historical(model) -> bool:
+        """
+        Checks is model a django-simple-history historical model or not.
+        True if somehow inherited from simple_history classes
+        :param model: django model instance
+        :return:
+        """
+        return any(['simple_history.' in str(m) for m in model.__mro__])
 
     def is_allowed_related(self, related) -> bool:
         """
@@ -278,6 +290,9 @@ class PlantUml:
             if self.omit and any([self.is_app_member(model, to_omit) for to_omit in self.omit]):
                 continue
             if self.include and all([not self.is_app_member(model, to_include) for to_include in self.include]):
+                continue
+            # or historical if omit_history
+            if self.omit_history and self.is_historical(model):
                 continue
             model_uml, model_choices = self.model_repr(model)
             uml += model_uml
