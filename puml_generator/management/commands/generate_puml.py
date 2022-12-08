@@ -66,6 +66,13 @@ class Command(BaseCommand):
             nargs='?',
             help='provide title',
         )
+        parser.add_argument(
+            '--title-font-size',
+            type=int,
+            default=72,
+            nargs='?',
+            help='title font size',
+        )
         add_bool_arg(
             parser, 'add-legend',
             'include explanation of the symbols used',
@@ -83,11 +90,13 @@ class Command(BaseCommand):
         include = options['include']
         omit = options['omit']
         title = options['title']
+        title_font_size = options['title_font_size']
 
         models = apps.get_models()
         generator = PlantUml(
             models,
             title=title,
+            title_font_size=title_font_size,
             with_legend=generate_with_legend,
             with_help=generate_with_help,
             with_choices=generate_with_choices,
