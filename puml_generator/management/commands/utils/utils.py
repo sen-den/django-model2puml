@@ -312,7 +312,7 @@ class PlantUml:
         """
         global_choices = dict()
 
-        uml = "@startuml {self.title}\n"
+        uml = f"@startuml {self.title}\n"
 
         if self.title:
             uml += f"""
