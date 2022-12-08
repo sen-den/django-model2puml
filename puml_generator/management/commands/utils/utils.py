@@ -78,6 +78,7 @@ class PlantUml:
             self,
             models=None,
             title=None,
+            title_font_size=None,
             with_legend=False,
             with_help=True,
             with_choices=True,
@@ -89,6 +90,7 @@ class PlantUml:
     ):
         self.models = models
         self.title = title
+        self.title_font_size = title_font_size
         self.with_legend = with_legend
         self.with_help = with_help
         self.with_choices = with_choices
@@ -272,7 +274,7 @@ class PlantUml:
         :param field: django model field
         :return: django model
         """
-        if type(field).__name__ == 'ForeignKey':
+        if type(field).__name__ in ('OneToOneField', 'ForeignKey'):
             return field.foreign_related_fields[0].model
         elif type(field).__name__ == 'ManyToManyField':
             return field.target_field.model
@@ -284,16 +286,18 @@ class PlantUml:
         :return: representation
         """
         uml = ''
+        one_to_one_line = '--'
         foreign_line = '*--'
         many_to_many_line = '*--*'
 
         fields = list(meta.fields)
         fields.extend(meta.many_to_many)
         # generate links to related models
-        for related in list(filter(lambda x: type(x).__name__ == 'ForeignKey', fields)):
+        for related in list(filter(lambda x: type(x).__name__ in ('OneToOneField', 'ForeignKey'), fields)):
             if self.with_omitted_headers or self.is_allowed_related(related):
                 related_meta = related.foreign_related_fields[0].model._meta
-                uml += f'{meta.label} {foreign_line} {related_meta.label}\n'
+                line = foreign_line if type(related) == "ForeignKey" else one_to_one_line
+                uml += f'{meta.label} {line} {related_meta.label}\n'
         for related in list(filter(lambda x: type(x).__name__ == 'ManyToManyField', fields)):
             if self.with_omitted_headers or self.is_allowed_related(related):
                 related_meta = related.target_field.model._meta
@@ -308,11 +312,11 @@ class PlantUml:
         """
         global_choices = dict()
 
-        uml = "@startuml\n"
+        uml = "@startuml {self.title}\n"
 
         if self.title:
             uml += f"""
-            skinparam titleFontSize 72
+            skinparam titleFontSize {self.title_font_size or 72}
 
             title
             {self.title}
