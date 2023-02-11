@@ -1,9 +1,8 @@
 import codecs
-
 from django.apps import apps
 from django.core.management import BaseCommand
 
-from puml_generator.management.commands.utils.utils import PlantUml
+from puml_generator.management.commands.utils.utils import PlantUml, uml_to_url
 
 
 def add_bool_arg(parser, name, help_yes, help_no, default=False):
@@ -71,6 +70,11 @@ class Command(BaseCommand):
             'include explanation of the symbols used',
             'do not include explanation of the symbols used'
         )
+        add_bool_arg(
+            parser, 'url',
+            'generate URL with diagram to planuml.com',
+            'do not generate URL with diagram to planuml.com'
+        )
 
     def handle(self, *args, **options):
         output = options['file']
@@ -101,3 +105,6 @@ class Command(BaseCommand):
 
         with codecs.open(output, 'w', encoding='utf-8') as file:
             file.write(uml)
+
+        if options['url']:
+            self.stdout.write(f"See your diagram at {uml_to_url(uml)}")

@@ -1,4 +1,7 @@
 import colorsys
+import zlib
+import base64
+import string
 from hashlib import md5
 from typing import Optional, Tuple
 import textwrap
@@ -35,6 +38,39 @@ def app_name_to_colour(name: str) -> str:
     r, g, b = colorsys.hls_to_rgb(hue, 0.90, 0.60)
     r, g, b = _h(r), _h(g), _h(b)
     return f'#{r}{g}{b}'
+
+
+def uml_to_url(uml: str) -> str:
+    """
+    Generate a string to plantuml.com
+    """
+
+    # https://github.com/sen-den/django-model2puml/issues/5
+    # Thanks @ddahan for this code sample
+
+    # 3- Compress with deflate custom algorithm
+    # 🔗 https://github.com/dougn/python-plantuml/blob/master/plantuml.py
+    plantuml_alphabet = (
+            string.digits + string.ascii_uppercase + string.ascii_lowercase + "-_"
+    )
+    base64_alphabet = (
+            string.ascii_uppercase + string.ascii_lowercase + string.digits + "+/"
+    )
+    b64_to_plantuml = bytes.maketrans(
+        base64_alphabet.encode("utf-8"), plantuml_alphabet.encode("utf-8")
+    )
+
+    zlibbed_str = zlib.compress(uml.encode("utf-8"))
+    compressed_string = zlibbed_str[2:-4]
+
+    # 4- re-encode in ASCII
+    final = (
+        base64.b64encode(compressed_string).translate(b64_to_plantuml).decode("utf-8")
+    )
+
+    # 5- Give URL to user
+    plant_uml_url = "https://www.plantuml.com/plantuml/svg/"  # could be /uml/ or /png too/
+    return f"{plant_uml_url}{final}"
 
 
 class PlantUml:

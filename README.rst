@@ -42,6 +42,7 @@ Params::
     --omit - specify apps to be omitted in diagram
     --include - specify apps to be included in diagram; other will be omitted
     --headers-only - use only model header and relations, omit fields list
+    --url - generate URL to plantuml.com/plantuml/svg/YOUR_DIAGRAM
 
 3. Check generated PlantUML file!
 
@@ -51,6 +52,11 @@ Params::
 
 Release notes
 -------------
+
+v0.3.0 (2023-02-11)
+...................
+
+- Add URL to plantuml.com generation
 
 v0.2.1 (2022-06-05)
 ...................
