@@ -55,6 +55,7 @@ Release notes
 -------------
 
 v0.4.0 (2023-02-11)
+...................
 
 - Add title-font-size param
 
