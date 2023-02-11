@@ -34,6 +34,7 @@ Params::
 
     --file - output file
     --title - provide a title for diagram
+    --title-font-size - provide a custom title font size (default is 72)
     --add-help - add models docstrings to diagram
     --add-choices - add Choices description of fields to diagram
     --add-legend - include explanation of the symbols used
@@ -52,6 +53,10 @@ Params::
 
 Release notes
 -------------
+
+v0.4.0 (2023-02-11)
+
+- Add title-font-size param
 
 v0.3.0 (2023-02-11)
 ...................
