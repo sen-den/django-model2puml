@@ -54,6 +54,11 @@ Params::
 Release notes
 -------------
 
+v0.4.1 (2023-02-13)
+...................
+
+- Fix usage of empty title not to break output filename
+
 v0.4.0 (2023-02-11)
 ...................
 
