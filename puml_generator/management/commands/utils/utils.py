@@ -82,6 +82,7 @@ class PlantUml:
             with_legend=False,
             with_help=True,
             with_choices=True,
+            split_choices=True,
             omit_history=True,
             include=None,
             omit=None,
@@ -94,6 +95,7 @@ class PlantUml:
         self.with_legend = with_legend
         self.with_help = with_help
         self.with_choices = with_choices
+        self.split_choices = split_choices
         self.omit_history = omit_history
         self.include = include
         self.omit = omit
@@ -248,10 +250,13 @@ class PlantUml:
                 uml += self.field_repr(field)
 
             if self.with_choices:
+                choices_name = field.name
+                if self.split_choices:
+                    choices_name = f'{meta.label}_{field.name}'
                 # collect field choices to future processing
                 choices = self.collect_choices(field)
                 if choices:
-                    model_choices[field.name] = choices
+                    model_choices[choices_name] = choices
 
         uml += f'    --\n'
         uml += f'}}\n'

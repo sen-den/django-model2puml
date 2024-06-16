@@ -45,6 +45,11 @@ class Command(BaseCommand):
             'models Choices fields should not be described'
         )
         add_bool_arg(
+            parser, 'split-choices',
+            'models Choices fields should be generated per model',
+            'models Choices fields should collapse into one if equally named'
+        )
+        add_bool_arg(
             parser, 'add-omitted-headers',
             'omitted models should be included as headers',
             'omitted models should not be included at all'
@@ -87,6 +92,7 @@ class Command(BaseCommand):
         output = options['file']
         generate_with_help = options['add-help']
         generate_with_choices = options['add-choices']
+        generate_with_split_choices = options['split-choices']
         generate_with_legend = options['add-legend']
         generate_with_omitted_headers = options['add-omitted-headers']
         generate_headers_only = options['headers-only']
@@ -104,6 +110,7 @@ class Command(BaseCommand):
             with_legend=generate_with_legend,
             with_help=generate_with_help,
             with_choices=generate_with_choices,
+            split_choices=generate_with_split_choices,
             omit_history=omit_history,
             include=include,
             omit=omit,
