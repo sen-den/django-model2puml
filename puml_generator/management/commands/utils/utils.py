@@ -215,6 +215,8 @@ class PlantUml:
                 return choices._display_map
             elif isinstance(choices, tuple):
                 return {k: (k, v) for k, v in choices}
+            elif isinstance(choices, list) and len(choices) > 0 and isinstance(choices[0], tuple):
+                return {k: (k, v) for k, v in choices}
 
     def model_repr(self, model) -> Tuple[str, dict]:
         """
