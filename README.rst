@@ -37,6 +37,7 @@ Params::
     --title-font-size - provide a custom title font size (default is 72)
     --add-help - add models docstrings to diagram
     --add-choices - add Choices description of fields to diagram
+    --split-choices - split Choices into per-model classes
     --add-legend - include explanation of the symbols used
     --add-omitted-headers - add a header stub for omitted foreign app
     --omit-history - omit Historical* tables from django-simple-history
@@ -53,6 +54,11 @@ Params::
 
 Release notes
 -------------
+
+v0.5.0 (2024-06-16)
+...................
+
+- Add `split-choices` flag to split choices into per-model classes
 
 v0.4.1 (2023-02-13)
 ...................
