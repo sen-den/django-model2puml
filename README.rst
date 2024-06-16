@@ -55,6 +55,11 @@ Params::
 Release notes
 -------------
 
+v0.5.1 (2024-06-16)
+...................
+
+- Fix `collect_choices` to collect `list[tuple]` choices
+
 v0.5.0 (2024-06-16)
 ...................
 
