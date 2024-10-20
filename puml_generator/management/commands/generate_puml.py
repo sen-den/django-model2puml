@@ -34,6 +34,12 @@ class Command(BaseCommand):
             nargs='+',
             help='include applications',
         )
+        parser.add_argument(
+            '--skip-choices-fields',
+            type=str,
+            nargs='+',
+            help='skip specified choices fields',
+        )
         add_bool_arg(
             parser, 'add-help',
             'docstrings should be included to diagram',
@@ -93,6 +99,7 @@ class Command(BaseCommand):
         generate_with_help = options['add-help']
         generate_with_choices = options['add-choices']
         generate_with_split_choices = options['split-choices']
+        skip_choices_fields = options['skip-choices-fields']
         generate_with_legend = options['add-legend']
         generate_with_omitted_headers = options['add-omitted-headers']
         generate_headers_only = options['headers-only']
@@ -111,6 +118,7 @@ class Command(BaseCommand):
             with_help=generate_with_help,
             with_choices=generate_with_choices,
             split_choices=generate_with_split_choices,
+            skip_choices_fields=skip_choices_fields,
             omit_history=omit_history,
             include=include,
             omit=omit,

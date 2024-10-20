@@ -83,6 +83,7 @@ class PlantUml:
             with_help=True,
             with_choices=True,
             split_choices=True,
+            skip_choices_fields=None,
             omit_history=True,
             include=None,
             omit=None,
@@ -96,6 +97,7 @@ class PlantUml:
         self.with_help = with_help
         self.with_choices = with_choices
         self.split_choices = split_choices
+        self.skip_choices_fields = skip_choices_fields
         self.omit_history = omit_history
         self.include = include
         self.omit = omit
@@ -235,6 +237,8 @@ class PlantUml:
         uml += f'{{\n'
         uml += f'    {meta.verbose_name}\n'
 
+        skipped_choices = self.skip_choices_fields or []
+
         if self.with_help:
             # add help text stored in docstring
             uml += f'    ..\n'
@@ -257,7 +261,7 @@ class PlantUml:
                     choices_name = f'{meta.label}_{field.name}'
                 # collect field choices to future processing
                 choices = self.collect_choices(field)
-                if choices:
+                if choices and field.name not in skipped_choices:
                     model_choices[choices_name] = choices
 
         uml += f'    --\n'
