@@ -55,6 +55,12 @@ Params::
 Release notes
 -------------
 
+v0.6.0 (2024-10-20)
+...................
+
+- Add `skip-choices-fields` param to skip specified choices fields
+- Fix block direction to try to decrease mess in huge diagrams
+
 v0.5.1 (2024-06-16)
 ...................
 
