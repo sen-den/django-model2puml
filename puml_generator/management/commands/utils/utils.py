@@ -273,7 +273,7 @@ class PlantUml:
         if self.with_choices:
             # generate links to choices list classes
             for choice_field_name, choices in model_choices.items():
-                uml += f'{meta.label} .-- {choice_field_name}\n'
+                uml += f'{meta.label} .right- {choice_field_name}\n'
 
         uml += f'\n\n'
         return uml, model_choices
@@ -297,9 +297,9 @@ class PlantUml:
         :return: representation
         """
         uml = ''
-        one_to_one_line = '--'
-        foreign_line = '*--'
-        many_to_many_line = '*--*'
+        one_to_one_line = '-up-'
+        foreign_line = '*-up-'
+        many_to_many_line = '*-up-*'
 
         fields = list(meta.fields)
         fields.extend(meta.many_to_many)
