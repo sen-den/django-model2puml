@@ -11,8 +11,8 @@ Plant UML generator
 .. image:: https://img.shields.io/github/languages/top/sen-den/django-model2puml
 .. image:: https://img.shields.io/pypi/pyversions/django-model2puml
 .. image:: https://img.shields.io/github/languages/code-size/sen-den/django-model2puml
-.. image:: https://img.shields.io/tokei/lines/github/sen-den/django-model2puml
-.. image:: https://img.shields.io/maintenance/yes/2022
+.. image:: https://img.shields.io/maintenance/yes/2024
+.. image:: https://static.pepy.tech/badge/django-model2puml
 
 django-model2puml app is a generator of project models structure in
 PlantUML class notation.
