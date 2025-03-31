@@ -55,6 +55,11 @@ Params::
 Release notes
 -------------
 
+v0.6.1 (2025-03-31)
+...................
+
+- Fix `skip-choices-fields` param to not fail if not provided
+
 v0.6.0 (2024-10-20)
 ...................
 
