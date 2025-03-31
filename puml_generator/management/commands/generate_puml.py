@@ -99,7 +99,9 @@ class Command(BaseCommand):
         generate_with_help = options['add-help']
         generate_with_choices = options['add-choices']
         generate_with_split_choices = options['split-choices']
-        skip_choices_fields = options['skip-choices-fields']
+        # TODO: investigate and resolve the issue with the skip_choices_fields parameter
+        #   For some reason it is not working fully as expected
+        skip_choices_fields = options['skip-choices-fields'] if options['skip-choices-fields'] else None
         generate_with_legend = options['add-legend']
         generate_with_omitted_headers = options['add-omitted-headers']
         generate_headers_only = options['headers-only']
